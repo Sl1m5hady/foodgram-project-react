@@ -18,24 +18,24 @@ class Tag(models.Model):
         return self.name
 
 
-class Recipy(models.Model):
+class Recipe(models.Model):
     name = models.CharField(max_length=200)
     author = models.ForeignKey(User, related_name='recipes',
                                on_delete=models.CASCADE)
     text = models.TextField()
     cooking_time = models.SmallIntegerField()  # добавиьб валицацию >= 1
     image = models.ImageField(upload_to='recipes/images/')
-    tags = models.ManyToManyField(Tag, through='TagRecipy')
+    tags = models.ManyToManyField(Tag, through='TagRecipe')
     ingredients = models.ManyToManyField(Ingredient,
-                                         through='IngredientRecipy')
+                                         through='IngredientRecipe')
 
 
-class TagRecipy(models.Model):
+class TagRecipe(models.Model):
     tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
-    recipy = models.ForeignKey(Recipy, on_delete=models.CASCADE)
+    recipy = models.ForeignKey(Recipe, on_delete=models.CASCADE)
 
 
-class IngredientRecipy(models.Model):
+class IngredientRecipe(models.Model):
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
-    recipy = models.ForeignKey(Recipy, on_delete=models.CASCADE)
+    recipy = models.ForeignKey(Recipe, on_delete=models.CASCADE)
     quantity = models.SmallIntegerField()  # валидация
