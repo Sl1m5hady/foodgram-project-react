@@ -25,17 +25,19 @@ class Recipe(models.Model):
     text = models.TextField()
     cooking_time = models.SmallIntegerField()  # добавиьб валицацию >= 1
     image = models.ImageField(upload_to='recipes/images/')
-    tags = models.ManyToManyField(Tag, through='TagRecipe')
+    tags = models.ManyToManyField(Tag, related_name='recipes')
     ingredients = models.ManyToManyField(Ingredient,
                                          through='IngredientRecipe')
 
 
-class TagRecipe(models.Model):
-    tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
-    recipy = models.ForeignKey(Recipe, on_delete=models.CASCADE)
+# class TagRecipe(models.Model):
+#     tag = models.ForeignKey(Tag, related_name='recipes',
+#                             on_delete=models.CASCADE)
+#     recipy = models.ForeignKey(Recipe, related_name='tags',
+#                                on_delete=models.CASCADE)
 
 
 class IngredientRecipe(models.Model):
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
-    recipy = models.ForeignKey(Recipe, on_delete=models.CASCADE)
-    quantity = models.SmallIntegerField()  # валидация
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
+    amount = models.SmallIntegerField()  # валидация
