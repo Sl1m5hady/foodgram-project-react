@@ -21,18 +21,19 @@ class Base64ImageField(serializers.ImageField):
         return super().to_internal_value(data)
 
 
-class IngredientSerializer(serializers.ModelSerializer):
-    name = serializers.CharField(source='ingredient.name')
-    id = serializers.IntegerField(source='ingredient.id')
-    measurement_unit = serializers.CharField(source='ingredient.measurement_unit')
+class IngredientInRecipeSerializer(serializers.ModelSerializer):
+    name = serializers.ReadOnlyField(source='ingredient.name')
+    id = serializers.ReadOnlyField(source='ingredient.id')
+    measurement_unit = serializers.ReadOnlyField(
+        source='ingredient.measurement_unit')
+    amount = serializers.ReadOnlyField()
 
     class Meta:
         model = IngredientRecipe
         fields = ('id', 'name', 'measurement_unit', 'amount')
 
 
-
-class IngredientRecipeSerializer(serializers.ModelSerializer):
+class AddIngredientSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField()
     # name = serializers.ReadOnlyField(source='ingredient.name')
     # measurement_unit = serializers.ReadOnlyField(
@@ -46,7 +47,7 @@ class IngredientRecipeSerializer(serializers.ModelSerializer):
 class RecipeSerializer(serializers.ModelSerializer):
     image = Base64ImageField()
     # tags = TagSerializer(required=True, many=True)
-    ingredients = IngredientRecipeSerializer(many=True)
+    ingredients = AddIngredientSerializer(many=True)
 
     class Meta:
         model = Recipe
@@ -56,31 +57,44 @@ class RecipeSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         tags = validated_data.pop('tags')
         ingredients = validated_data.pop('ingredients')
-        print(ingredients)
         recipe = Recipe.objects.create(**validated_data)
         recipe.tags.set(tags)
         # recipe.ingredients.set(ingredients)
         for ingredient in ingredients:
-            print(ingredient)
-            ingredient['ingredient_id'] = ingredient['id']
-            ingredient.pop('id')
+            ingredient['ingredient_id'] = ingredient.pop('id')
+            # ingredient.pop('id')
             ingredient['recipe_id'] = recipe.pk
             IngredientRecipe.objects.create(**ingredient)
             # recipe.ingredients.set(current_ingredient)
         return recipe
 #         # for ingredient in ingredients:
 
+    def update(self, recipe, validated_data):  # Bulk_create
+        recipe.tags.clear()
+        tags = validated_data.pop('tags')
+        ingredients = validated_data.pop('ingredients')
+        recipe.tags.set(tags)
+        IngredientRecipe.objects.filter(recipe=recipe).delete()
+        for ingredient in ingredients:
+            ingredient['ingredient_id'] = ingredient.pop('id')
+            # ingredient.pop('id')
+            ingredient['recipe_id'] = recipe.pk
+            IngredientRecipe.objects.create(**ingredient)
+        # recipe.objects.update(**validated_data)
+        return super().update(recipe, validated_data)
+
     def to_representation(self, instance):
         context = {'request': self.context.get('request')}
-        return RecipeGetSerializer(instance, context=context).data
+        return GetRecipeSerializer(instance, context=context).data
 
 
-class RecipeGetSerializer(serializers.ModelSerializer):
-    ingredients = IngredientSerializer(many=True, read_only=True,
-                                       source='ingredientrecipe_set')
+class GetRecipeSerializer(serializers.ModelSerializer):
+    ingredients = IngredientInRecipeSerializer(many=True, read_only=True,
+                                               source='ingredientrecipe_set')
 
     class Meta:
         model = Recipe
-        fields = ('author', 'id', 'name', 'text', 'cooking_time',
+        fields = ('id', 'author', 'name', 'text', 'cooking_time',
                   'ingredients', 'image', 'tags')
-        depth = 1
+        read_only_fields = ('id', 'author')
+        # depth = 1
