@@ -27,7 +27,7 @@ class Recipe(models.Model):
     image = models.ImageField(upload_to='recipes/images/')
     tags = models.ManyToManyField(Tag, related_name='recipes')
     ingredients = models.ManyToManyField(Ingredient,
-                                         through='IngredientRecipe')
+                                         through='IngredientRecipe',)
 
 
 # class TagRecipe(models.Model):
@@ -41,3 +41,16 @@ class IngredientRecipe(models.Model):
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
     amount = models.SmallIntegerField()  # валидация
+
+
+class Favorite(models.Model):
+    user = models.ForeignKey(User, related_name='favorite',
+                             on_delete=models.CASCADE)
+    recipe = models.ForeignKey(Recipe, related_name='favorited_by',
+                               on_delete=models.CASCADE)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['user', 'recipe'],
+                                    name='unique_favorite')
+        ]

@@ -1,7 +1,7 @@
 import base64
 from rest_framework import serializers
 from django.core.files.base import ContentFile
-from .models import Recipe, Tag, Ingredient, IngredientRecipe
+from .models import Recipe, Tag, Ingredient, IngredientRecipe, Favorite
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -88,13 +88,42 @@ class RecipeSerializer(serializers.ModelSerializer):
         return GetRecipeSerializer(instance, context=context).data
 
 
+class RecipeLightSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Recipe
+        fields = ('id', 'name', 'image', 'cooking_time')
+
+
 class GetRecipeSerializer(serializers.ModelSerializer):
     ingredients = IngredientInRecipeSerializer(many=True, read_only=True,
                                                source='ingredientrecipe_set')
+    is_favorited = serializers.SerializerMethodField()
 
     class Meta:
         model = Recipe
         fields = ('id', 'author', 'name', 'text', 'cooking_time',
-                  'ingredients', 'image', 'tags')
-        read_only_fields = ('id', 'author')
+                  'ingredients', 'image', 'tags', 'is_favorited')
+        # read_only_fields = '__all__'
         # depth = 1
+
+    def get_is_favorited(self, recipe):
+        user = self.context['request'].user
+        return Favorite.objects.filter(recipe=recipe, user=user).exists()
+
+class FavoriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Favorite
+        fields = ('user', 'recipe')
+        # read_only_fields = ('user', 'recipe')
+        validators = [
+            serializers.UniqueTogetherValidator(
+                fields=('user', 'recipe'),
+                queryset=Favorite.objects.all(),
+                message='Этот рецепт уже находится в избранном!'
+            )
+        ]
+
+    def to_representation(self, instance):
+        context = {'request': self.context.get('request')}
+        recipe = Recipe.objects.get(id=instance.recipe_id)
+        return RecipeLightSerializer(recipe).data
