@@ -1,7 +1,10 @@
 import base64
-from rest_framework import serializers
+
 from django.core.files.base import ContentFile
-from .models import Recipe, Tag, Ingredient, IngredientRecipe, Favorite
+from rest_framework import serializers
+
+from .models import (Favorite, Ingredient, IngredientRecipe, Recipe,
+                     ShoppingCart, Tag)
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -19,6 +22,12 @@ class Base64ImageField(serializers.ImageField):
             data = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
 
         return super().to_internal_value(data)
+
+
+class IngredientSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ingredient
+        fields = '__all__'
 
 
 class IngredientInRecipeSerializer(serializers.ModelSerializer):
@@ -94,21 +103,28 @@ class RecipeLightSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'image', 'cooking_time')
 
 
-class GetRecipeSerializer(serializers.ModelSerializer):
+class GetRecipeSerializer(serializers.ModelSerializer):  # tags full info
     ingredients = IngredientInRecipeSerializer(many=True, read_only=True,
                                                source='ingredientrecipe_set')
     is_favorited = serializers.SerializerMethodField()
+    is_in_shopping_cart = serializers.SerializerMethodField()
 
     class Meta:
         model = Recipe
         fields = ('id', 'author', 'name', 'text', 'cooking_time',
-                  'ingredients', 'image', 'tags', 'is_favorited')
+                  'ingredients', 'image', 'tags', 'is_favorited',
+                  'is_in_shopping_cart')
         # read_only_fields = '__all__'
         # depth = 1
 
     def get_is_favorited(self, recipe):
         user = self.context['request'].user
         return Favorite.objects.filter(recipe=recipe, user=user).exists()
+
+    def get_is_in_shopping_cart(self, recipe):
+        user = self.context['request'].user
+        return ShoppingCart.objects.filter(recipe=recipe, user=user).exists()
+
 
 class FavoriteSerializer(serializers.ModelSerializer):
     class Meta:
@@ -124,6 +140,25 @@ class FavoriteSerializer(serializers.ModelSerializer):
         ]
 
     def to_representation(self, instance):
-        context = {'request': self.context.get('request')}
+        # context = {'request': self.context.get('request')}
+        recipe = Recipe.objects.get(id=instance.recipe_id)
+        return RecipeLightSerializer(recipe).data
+
+
+class ShoppingCartSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ShoppingCart
+        fields = ('user', 'recipe')
+        # read_only_fields = ('user', 'recipe')
+        validators = [
+            serializers.UniqueTogetherValidator(
+                fields=('user', 'recipe'),
+                queryset=ShoppingCart.objects.all(),
+                message='Этот рецепт уже находится в покупках!'
+            )
+        ]
+
+    def to_representation(self, instance):
+        # context = {'request': self.context.get('request')}
         recipe = Recipe.objects.get(id=instance.recipe_id)
         return RecipeLightSerializer(recipe).data
