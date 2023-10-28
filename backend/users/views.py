@@ -1,18 +1,24 @@
-from djoser.views import UserViewSet
-from rest_framework.decorators import action
-from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
-from users.serializers import FollowSerializer, UserWithRecipesSerializer
+from django.shortcuts import get_object_or_404
+from djoser.views import UserViewSet
+from rest_framework import status
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from users.models import Follow
-from rest_framework import status
-
+from users.serializers import FollowSerializer, UserWithRecipesSerializer
+from rest_framework.permissions import IsAuthenticated
 
 User = get_user_model()
 
 
 class CustomUserViewSet(UserViewSet):
-    @action(detail=True, methods=['POST', 'DELETE'])
+    @action(detail=False, methods=['GET'],
+            permission_classes=[IsAuthenticated])
+    def me(self, request, *args, **kwargs):
+        return super().me(request, *args, **kwargs)
+
+    @action(detail=True, methods=['POST', 'DELETE'],
+            permission_classes=[IsAuthenticated])
     def subscribe(self, request, id):
         user = request.user
         author = get_object_or_404(User, id=id)
@@ -33,12 +39,17 @@ class CustomUserViewSet(UserViewSet):
             data={'errors': 'Подписки не существует'},
             status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=False, methods=['GET',])
+    @action(detail=False, methods=['GET',],
+            permission_classes=[IsAuthenticated])
     def subscriptions(self, request):
         user = request.user
+        paginator = self.paginator
         following = User.objects.filter(followed_by__follower=user)
+        result = paginator.paginate_queryset(
+            queryset=following, request=request
+        )
         context = {'request': request}
         serializer = UserWithRecipesSerializer(
-            instance=following, many=True, context=context
+            result, many=True, context=context
         )
-        return Response(data=serializer.data)
+        return self.get_paginated_response(serializer.data)

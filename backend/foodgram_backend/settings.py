@@ -26,10 +26,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'django_filters',
     'rest_framework.authtoken',
     'djoser',
     'recipes.apps.RecipesConfig',
     'users.apps.UsersConfig',
+    'api.apps.ApiConfig',
 ]
 
 MIDDLEWARE = [
@@ -96,7 +98,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru-ru'
 
 TIME_ZONE = 'UTC'
 
@@ -122,10 +124,12 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
     ],
-
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
-    ]
+    ],
+    'DEFAULT_PAGINATION_CLASS':
+        'api.pagination.CustomPagination',
+    'PAGE_SIZE': 6
 }
 
 
@@ -137,7 +141,9 @@ DJOSER = {
         'current_user': 'users.serializers.UserSerializer',
     },
     'PERMISSIONS': {
-        'user': ['rest_framework.permissions.AllowAny'],
+        'user_list': ['rest_framework.permissions.AllowAny'],
+        'user': ['api.permissions.ReadOnly'],
+        'user_delete': ['rest_framework.permissions.IsAdmin'],
     },
     'HIDE_USERS': False
 }
