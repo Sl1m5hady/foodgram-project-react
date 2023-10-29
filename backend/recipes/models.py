@@ -52,11 +52,6 @@ class Recipe(models.Model):
 
     def __str__(self):
         return self.name
-# class TagRecipe(models.Model):
-#     tag = models.ForeignKey(Tag, related_name='recipes',
-#                             on_delete=models.CASCADE)
-#     recipy = models.ForeignKey(Recipe, related_name='tags',
-#                                on_delete=models.CASCADE)
 
 
 class IngredientRecipe(models.Model):

@@ -4,7 +4,6 @@ from recipes.models import Recipe
 
 
 class RecipeFilter(df.FilterSet):
-    # author = df.CharFilter(field_name='author')
     tags = df.AllValuesMultipleFilter(field_name='tags__slug')
     is_favorited = df.BooleanFilter(method='get_is_favorited')
     is_in_shopping_cart = df.BooleanFilter(method='get_is_in_shopping_cart')
