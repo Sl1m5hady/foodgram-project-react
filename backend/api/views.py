@@ -105,6 +105,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         buffer.seek(0)
         return FileResponse(buffer, as_attachment=True, filename="file.pdf")
 
+
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     pagination_class = None
     serializer_class = TagSerializer
