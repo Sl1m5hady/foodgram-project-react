@@ -14,7 +14,6 @@ from rest_framework.response import Response
 
 from api.filters import RecipeFilter
 from api.permissions import IsAuthorOrReadOnly
-
 from recipes.models import (Favorite, Ingredient, IngredientRecipe, Recipe,
                             ShoppingCart, Tag)
 from recipes.serializers import (FavoriteSerializer, IngredientSerializer,

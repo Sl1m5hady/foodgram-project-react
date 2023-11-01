@@ -1,11 +1,11 @@
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
-from django.conf import settings
 
 from api.views import IngredientViewSet, RecipeViewSet, TagViewSet
 from users.views import CustomUserViewSet
-from django.conf.urls.static import static
 
 router = DefaultRouter()
 router.register(r'recipes', RecipeViewSet)
