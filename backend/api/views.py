@@ -84,9 +84,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
         p.drawString(50, y, "Список покупок:")
 
         ingredients = IngredientRecipe.objects.filter(
-            recipe__in_shopping_cart__user=request.user).values(
-            'ingredient__name', 'ingredient__measurement_unit'
-            ).annotate(value=Sum('amount'))
+            recipe__in_shopping_cart__user=request.user
+            ).values(
+                'ingredient__name', 'ingredient__measurement_unit').annotate(
+                    value=Sum('amount'))
 
         for ingredient in ingredients:
             p.setFont('Times', 16)

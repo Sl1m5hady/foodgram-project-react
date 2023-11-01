@@ -40,7 +40,7 @@ class CustomUserViewSet(UserViewSet):
             data={'errors': 'Подписки не существует'},
             status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=False, methods=['GET',],
+    @action(detail=False, methods=['GET'],
             permission_classes=[IsAuthenticated])
     def subscriptions(self, request):
         user = request.user
