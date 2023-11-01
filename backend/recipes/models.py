@@ -45,6 +45,11 @@ class Recipe(models.Model):
                                   verbose_name='Теги',)
     ingredients = models.ManyToManyField(
         Ingredient, through='IngredientRecipe', verbose_name='Ингредиенты',)
+    pub_date = models.DateTimeField(
+        verbose_name="Дата публикации",
+        auto_now_add=True,
+        editable=False,
+    )
 
     class Meta:
         verbose_name = 'Рецепт'
