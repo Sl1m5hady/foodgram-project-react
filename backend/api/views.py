@@ -75,25 +75,28 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def download_shopping_cart(self, request):
         buffer = io.BytesIO()
         p = canvas.Canvas(buffer)
-        timesb = TTFont('TimesB', 'data/timesbd.ttf')
-        times = TTFont('Times', 'data/times.ttf')
+        timesb = TTFont("TimesB", "data/timesbd.ttf")
+        times = TTFont("Times", "data/times.ttf")
         pdfmetrics.registerFont(timesb)
         pdfmetrics.registerFont(times)
-        p.setFont('TimesB', 20)
+        p.setFont("TimesB", 20)
         y = 800
         p.drawString(50, y, "Список покупок:")
 
-        ingredients = IngredientRecipe.objects.filter(
-            recipe__in_shopping_cart__user=request.user
-            ).values(
-                'ingredient__name', 'ingredient__measurement_unit').annotate(
-                    value=Sum('amount'))
+        ingredients = (
+            IngredientRecipe.objects.filter(
+                recipe__in_shopping_cart__user=request.user)
+            .values("ingredient__name", "ingredient__measurement_unit")
+            .annotate(value=Sum("amount"))
+        )
 
         for ingredient in ingredients:
-            p.setFont('Times', 16)
-            line = (f'{ingredient["ingredient__name"]}: '
-                    f'{ingredient["ingredient__measurement_unit"]} '
-                    f'{ingredient["value"]}')
+            p.setFont("Times", 16)
+            line = (
+                f'{ingredient["ingredient__name"]}: '
+                f'{ingredient["ingredient__measurement_unit"]} '
+                f'{ingredient["value"]}'
+            )
             y = y - 40
             p.drawString(50, y, line)
 
@@ -101,7 +104,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
         p.save()
         buffer.seek(0)
         return FileResponse(buffer, as_attachment=True, filename="file.pdf")
-
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     pagination_class = None
