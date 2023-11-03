@@ -41,6 +41,7 @@ sudo docker compose -f docker-compose.production.yml exec backend python manage.
 ```
 sudo docker compose -f docker-compose.production.yml stop
 ```
+
 - Для удаления контейнеров:
 ```
 sudo docker compose-f docker-compose.production.yml down

@@ -4,13 +4,13 @@ from recipes.models import Recipe
 
 
 class RecipeFilter(df.FilterSet):
-    tags = df.AllValuesMultipleFilter(field_name='tags__slug')
-    is_favorited = df.BooleanFilter(method='get_is_favorited')
-    is_in_shopping_cart = df.BooleanFilter(method='get_is_in_shopping_cart')
+    tags = df.AllValuesMultipleFilter(field_name="tags__slug")
+    is_favorited = df.BooleanFilter(method="get_is_favorited")
+    is_in_shopping_cart = df.BooleanFilter(method="get_is_in_shopping_cart")
 
     class Meta:
         model = Recipe
-        fields = ('author', 'tags', 'is_favorited', 'is_in_shopping_cart')
+        fields = ("author", "tags", "is_favorited", "is_in_shopping_cart")
 
     def get_is_favorited(self, queryset, field_name, value):
         if value and self.request.user.is_authenticated:

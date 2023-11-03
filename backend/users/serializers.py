@@ -12,21 +12,21 @@ User = get_user_model()
 
 class UserCreateSerializer(UserCreateSerializer):
     email = serializers.EmailField(
-        validators=[UniqueValidator(queryset=User.objects.all())])
+        validators=[UniqueValidator(queryset=User.objects.all())]
+    )
 
     class Meta:
         model = User
-        fields = ('id', 'email', 'username', 'first_name', 'last_name',
-                  'password')
-        read_only_fields = ('id',)
+        fields = ("id", "email", "username", "first_name", "last_name", "password")
+        read_only_fields = ("id",)
         extra_kwargs = {
-            'first_name': {'required': True},
-            'last_name': {'required': True},
+            "first_name": {"required": True},
+            "last_name": {"required": True},
         }
 
     def validate_username(self, value):
-        if value == 'me':
-            raise serializers.ValidationError('Запрещенное имя пользователя')
+        if value == "me":
+            raise serializers.ValidationError("Запрещенное имя пользователя")
         return value
 
 
@@ -35,16 +35,14 @@ class UserSerializer(UserSerializer):
 
     class Meta:
         model = User
-        fields = ['email', 'id', 'username', 'first_name', 'last_name',
-                  'is_subscribed']
+        fields = ["email", "id", "username", "first_name", "last_name", "is_subscribed"]
 
     def get_is_subscribed(self, instance):
-        request = self.context.get('request')
+        request = self.context.get("request")
         if request:
-            user = self.context['request'].user
+            user = self.context["request"].user
             if user.is_authenticated:
-                return Follow.objects.filter(follower=user,
-                                             following=instance).exists()
+                return Follow.objects.filter(follower=user, following=instance).exists()
         return False
 
 
@@ -53,33 +51,33 @@ class UserWithRecipesSerializer(UserSerializer):
     recipes_count = serializers.SerializerMethodField()
 
     class Meta(UserSerializer.Meta):
-        fields = UserSerializer.Meta.fields + ['recipes', 'recipes_count']
+        fields = UserSerializer.Meta.fields + ["recipes", "recipes_count"]
 
     def get_recipes_count(self, instance):
         return instance.recipes.count()
 
     def get_recipes(self, instance):
-        request = self.context.get('request')
-        limit = request.GET.get('recipes_limit')
+        request = self.context.get("request")
+        limit = request.GET.get("recipes_limit")
         recipes = Recipe.objects.filter(author=instance)
         if limit:
-            recipes = recipes[:int(limit)]
+            recipes = recipes[: int(limit)]
         return RecipeLightSerializer(recipes, many=True, read_only=True).data
 
 
 class FollowSerializer(serializers.ModelSerializer):
     class Meta:
         model = Follow
-        fields = ('follower', 'following')
+        fields = ("follower", "following")
         validators = [
             serializers.UniqueTogetherValidator(
-                fields=('follower', 'following'),
+                fields=("follower", "following"),
                 queryset=Follow.objects.all(),
-                message='Подписка уже существует.'
+                message="Подписка уже существует.",
             )
         ]
 
     def to_representation(self, instance):
-        context = {'request': self.context.get('request')}
+        context = {"request": self.context.get("request")}
         user = User.objects.get(pk=instance.following_id)
         return UserWithRecipesSerializer(user, context=context).data

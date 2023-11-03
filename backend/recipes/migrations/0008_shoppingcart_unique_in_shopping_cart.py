@@ -4,14 +4,15 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('recipes', '0007_auto_20230918_1715'),
+        ("recipes", "0007_auto_20230918_1715"),
     ]
 
     operations = [
         migrations.AddConstraint(
-            model_name='shoppingcart',
-            constraint=models.UniqueConstraint(fields=('user', 'recipe'), name='unique_in_shopping_cart'),
+            model_name="shoppingcart",
+            constraint=models.UniqueConstraint(
+                fields=("user", "recipe"), name="unique_in_shopping_cart"
+            ),
         ),
     ]

@@ -6,7 +6,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -15,46 +14,101 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Ingredient',
+            name="Ingredient",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=200)),
-                ('measurement_unit', models.CharField(max_length=200)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=200)),
+                ("measurement_unit", models.CharField(max_length=200)),
             ],
         ),
         migrations.CreateModel(
-            name='IngredientRecipe',
+            name="IngredientRecipe",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('amount', models.SmallIntegerField()),
-                ('ingredient', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='recipes.ingredient')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("amount", models.SmallIntegerField()),
+                (
+                    "ingredient",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="recipes.ingredient",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Tag',
+            name="Tag",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=200)),
-                ('color', models.CharField(blank=True, max_length=7)),
-                ('slug', models.SlugField(max_length=200)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=200)),
+                ("color", models.CharField(blank=True, max_length=7)),
+                ("slug", models.SlugField(max_length=200)),
             ],
         ),
         migrations.CreateModel(
-            name='Recipe',
+            name="Recipe",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=200)),
-                ('text', models.TextField()),
-                ('cooking_time', models.SmallIntegerField()),
-                ('image', models.ImageField(upload_to='recipes/images/')),
-                ('author', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='recipes', to=settings.AUTH_USER_MODEL)),
-                ('ingredients', models.ManyToManyField(through='recipes.IngredientRecipe', to='recipes.Ingredient')),
-                ('tags', models.ManyToManyField(related_name='recipes', to='recipes.Tag')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=200)),
+                ("text", models.TextField()),
+                ("cooking_time", models.SmallIntegerField()),
+                ("image", models.ImageField(upload_to="recipes/images/")),
+                (
+                    "author",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="recipes",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "ingredients",
+                    models.ManyToManyField(
+                        through="recipes.IngredientRecipe", to="recipes.Ingredient"
+                    ),
+                ),
+                (
+                    "tags",
+                    models.ManyToManyField(related_name="recipes", to="recipes.Tag"),
+                ),
             ],
         ),
         migrations.AddField(
-            model_name='ingredientrecipe',
-            name='recipy',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='recipes.recipe'),
+            model_name="ingredientrecipe",
+            name="recipy",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="recipes.recipe"
+            ),
         ),
     ]

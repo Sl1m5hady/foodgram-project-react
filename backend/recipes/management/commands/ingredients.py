@@ -7,7 +7,7 @@ from recipes.models import Ingredient
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        f = open('data/ingredients.json')
+        f = open("data/ingredients.json")
         data = json.load(f)
         f.close()
 
@@ -17,4 +17,4 @@ class Command(BaseCommand):
             ingredients.append(ingredient)
 
         Ingredient.objects.bulk_create(ingredients)
-        self.stdout.write('Ингредиенты добавлены!')
+        self.stdout.write("Ингредиенты добавлены!")
