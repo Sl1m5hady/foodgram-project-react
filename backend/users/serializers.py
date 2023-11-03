@@ -17,7 +17,14 @@ class UserCreateSerializer(UserCreateSerializer):
 
     class Meta:
         model = User
-        fields = ("id", "email", "username", "first_name", "last_name", "password")
+        fields = (
+            "id",
+            "email",
+            "username",
+            "first_name",
+            "last_name",
+            "password",
+        )
         read_only_fields = ("id",)
         extra_kwargs = {
             "first_name": {"required": True},
@@ -35,14 +42,23 @@ class UserSerializer(UserSerializer):
 
     class Meta:
         model = User
-        fields = ["email", "id", "username", "first_name", "last_name", "is_subscribed"]
+        fields = [
+            "email",
+            "id",
+            "username",
+            "first_name",
+            "last_name",
+            "is_subscribed",
+        ]
 
     def get_is_subscribed(self, instance):
         request = self.context.get("request")
         if request:
             user = self.context["request"].user
             if user.is_authenticated:
-                return Follow.objects.filter(follower=user, following=instance).exists()
+                return Follow.objects.filter(
+                    follower=user, following=instance
+                ).exists()
         return False
 
 

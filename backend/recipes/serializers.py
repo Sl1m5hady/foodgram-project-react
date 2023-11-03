@@ -3,7 +3,14 @@ import base64
 from django.core.files.base import ContentFile
 from rest_framework import serializers
 
-from .models import Favorite, Ingredient, IngredientRecipe, Recipe, ShoppingCart, Tag
+from .models import (
+    Favorite,
+    Ingredient,
+    IngredientRecipe,
+    Recipe,
+    ShoppingCart,
+    Tag,
+)
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -32,7 +39,9 @@ class IngredientSerializer(serializers.ModelSerializer):
 class IngredientInRecipeSerializer(serializers.ModelSerializer):
     name = serializers.ReadOnlyField(source="ingredient.name")
     id = serializers.ReadOnlyField(source="ingredient.id")
-    measurement_unit = serializers.ReadOnlyField(source="ingredient.measurement_unit")
+    measurement_unit = serializers.ReadOnlyField(
+        source="ingredient.measurement_unit"
+    )
     amount = serializers.ReadOnlyField()
 
     class Meta:
@@ -54,7 +63,14 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Recipe
-        fields = ("name", "text", "cooking_time", "ingredients", "image", "tags")
+        fields = (
+            "name",
+            "text",
+            "cooking_time",
+            "ingredients",
+            "image",
+            "tags",
+        )
 
     def create(self, validated_data):
         tags = validated_data.pop("tags")
@@ -121,7 +137,9 @@ class GetRecipeSerializer(serializers.ModelSerializer):
         if request:
             user = self.context["request"].user
             if user.is_authenticated:
-                return Favorite.objects.filter(recipe=recipe, user=user).exists()
+                return Favorite.objects.filter(
+                    recipe=recipe, user=user
+                ).exists()
         return False
 
     def get_is_in_shopping_cart(self, recipe):
@@ -129,7 +147,9 @@ class GetRecipeSerializer(serializers.ModelSerializer):
         if request:
             user = self.context["request"].user
             if user.is_authenticated:
-                return ShoppingCart.objects.filter(recipe=recipe, user=user).exists()
+                return ShoppingCart.objects.filter(
+                    recipe=recipe, user=user
+                ).exists()
         return False
 
 

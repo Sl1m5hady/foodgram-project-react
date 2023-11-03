@@ -51,8 +51,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
             serializer = FavoriteSerializer(data=data)
             serializer.is_valid(raise_exception=True)
             serializer.save()
-            return Response(data=serializer.data, status=status.HTTP_201_CREATED)
-        if request.method == "DELETE" and Favorite.objects.filter(**data).exists():
+            return Response(
+                data=serializer.data, status=status.HTTP_201_CREATED
+            )
+        if (
+            request.method == "DELETE"
+            and Favorite.objects.filter(**data).exists()
+        ):
             Favorite.objects.get(**data).delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(
@@ -61,7 +66,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
         )
 
     @action(
-        detail=True, methods=["POST", "DELETE"], permission_classes=[IsAuthenticated]
+        detail=True,
+        methods=["POST", "DELETE"],
+        permission_classes=[IsAuthenticated],
     )
     def shopping_cart(self, request, pk):
         user = request.user
@@ -71,8 +78,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
             serializer = ShoppingCartSerializer(data=data)
             serializer.is_valid(raise_exception=True)
             serializer.save()
-            return Response(data=serializer.data, status=status.HTTP_201_CREATED)
-        if request.method == "DELETE" and ShoppingCart.objects.filter(**data).exists():
+            return Response(
+                data=serializer.data, status=status.HTTP_201_CREATED
+            )
+        if (
+            request.method == "DELETE"
+            and ShoppingCart.objects.filter(**data).exists()
+        ):
             ShoppingCart.objects.get(**data).delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(
@@ -80,7 +92,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
-    @action(detail=False, methods=["GET"], permission_classes=[IsAuthenticated])
+    @action(
+        detail=False, methods=["GET"], permission_classes=[IsAuthenticated]
+    )
     def download_shopping_cart(self, request):
         buffer = io.BytesIO()
         p = canvas.Canvas(buffer)
@@ -93,7 +107,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
         p.drawString(50, y, "Список покупок:")
 
         ingredients = (
-            IngredientRecipe.objects.filter(recipe__in_shopping_cart__user=request.user)
+            IngredientRecipe.objects.filter(
+                recipe__in_shopping_cart__user=request.user
+            )
             .values("ingredient__name", "ingredient__measurement_unit")
             .annotate(value=Sum("amount"))
         )

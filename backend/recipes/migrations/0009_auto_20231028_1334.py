@@ -19,7 +19,10 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterModelOptions(
             name="recipe",
-            options={"verbose_name": "Рецепт", "verbose_name_plural": "Рецепты"},
+            options={
+                "verbose_name": "Рецепт",
+                "verbose_name_plural": "Рецепты",
+            },
         ),
         migrations.AlterModelOptions(
             name="tag",

@@ -25,7 +25,8 @@ class Tag(models.Model):
         blank=True,
         validators=[
             RegexValidator(
-                regex="^#([a-fA-f0-9]{6}|[a-fA-f0-9]{3})$", message="Неверный цвет"
+                regex="^#([a-fA-f0-9]{6}|[a-fA-f0-9]{3})$",
+                message="Неверный цвет",
             )
         ],
     )
@@ -84,14 +85,18 @@ class IngredientRecipe(models.Model):
 
 
 class Favorite(models.Model):
-    user = models.ForeignKey(User, related_name="favorite", on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        User, related_name="favorite", on_delete=models.CASCADE
+    )
     recipe = models.ForeignKey(
         Recipe, related_name="favorited_by", on_delete=models.CASCADE
     )
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=["user", "recipe"], name="unique_favorite")
+            models.UniqueConstraint(
+                fields=["user", "recipe"], name="unique_favorite"
+            )
         ]
 
 
