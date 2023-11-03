@@ -19,7 +19,7 @@ class Ingredient(models.Model):
 
 class Tag(models.Model):
     name = models.CharField('Название', max_length=200)
-    color = models.CharField('Цвет', max_length=7, blank=True, validators=[
+    color = models.CharField('Цвет', max_length=15, blank=True, validators=[
         RegexValidator(regex='^#([a-fA-f0-9]{6}|[a-fA-f0-9]{3})$',
                        message='Неверный цвет')
     ])
